@@ -1,7 +1,8 @@
 #include "mapeamento.hpp"
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
+#include <cstdio> 
 
 void Mapeamento::mapearCoordenadas() { // aqui é só pra pegar as coordenadas e jogar no vetor de pontos
     std::cout << "Digite a quantidade de pontos a serem mapeados: " << std::endl;
@@ -14,12 +15,55 @@ void Mapeamento::mapearCoordenadas() { // aqui é só pra pegar as coordenadas e
             i--;
         } else {
             Pontos.push_back({x, y});
+            pontosBrutos.push_back({x, y});
+            processarPonto(x, y);
         }
     }
+        
     std::cout << "Coordenadas mapeadas: " << std::endl;
     for(size_t i = 0; i < Pontos.size(); i++) {
         std::cout << "Ponto " << i + 1 << ": (" << Pontos[i].x << "," << Pontos[i].y << ")" << std::endl;
     }
+}
+
+void Mapeamento::processarPonto(float px, float py) {
+    bool encontrou = false;
+    float limitee = 0.7f;
+    
+    for (auto& b : mapaFinal) {
+        float d = sqrt(pow(px - b.x, 2) + pow(py - b.y, 2));
+        if (d <= limite) {
+            // Média acumulativa  ajustar o centro  da base
+            b.x = ((b.x * b.contagem) + px) / (b.contagem + 1);
+            b.y = ((b.y * b.contagem) + py) / (b.contagem + 1);
+            b.contagem++;
+            encontrou = true;
+            break;
+        }
+    }
+    if (!encontrou) {
+        mapaFinal.push_back({px, py, 1}); // Nova base encontrada
+    }
+}
+void Mapeamento::gerarArquivoPlot() {
+    //grafico 1 com tudo
+    FILE* fBruto = fopen("pontos_brutos.txt", "w");
+    if(fBruto) {
+        for(size_t i = 0; i < pontosBrutos.size(); i++) {
+            fprintf(fBruto, "%f %f\n", pontosBrutos[i].x, pontosBrutos[i].y);
+        }
+        fclose(fBruto);
+    }
+
+    // grafico 2 = dados processados 
+    FILE* fMapa = fopen("mapa_final.txt", "w");
+    if(fMapa) {
+        for(size_t i = 0; i < mapaFinal.size(); i++) {
+            fprintf(fMapa, "%f %f\n", mapaFinal[i].x, mapaFinal[i].y);
+        }
+        fclose(fMapa);
+    }
+    std::cout << "\nArquivos para os dois graficos gerados com sucesso!" << std::endl;
 }
 
 void Mapeamento::calcularDistancia() { // calcula o modulo da distancia entre os pontos
