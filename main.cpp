@@ -9,6 +9,7 @@ int main(){
     mapeamento.mapearCoordenadas();
     mapeamento.calcularDistancia();
     mapeamento.calcularMedia();
+    mapeamento.gerarArquivoPlot();
 
     return 0;
 }
