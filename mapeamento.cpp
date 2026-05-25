@@ -4,6 +4,13 @@
 #include <cmath>
 #include <cstdio>
 
+void Mapeamento::mapearCoordenadas() { 
+    Pontos.clear();
+    Distancia.clear();
+    Media.clear();
+    pontosBrutos.clear();
+    mapaFinal.clear();
+
 void Mapeamento::mapearCoordenadas() { // aqui é só pra pegar as coordenadas e jogar no vetor de pontos
     std::cout << "Digite a quantidade de pontos a serem mapeados: " << std::endl;
     std::cin >> qtd;
@@ -17,16 +24,21 @@ void Mapeamento::mapearCoordenadas() { // aqui é só pra pegar as coordenadas e
             Pontos.push_back({x, y});
             pontosBrutos.push_back({x, y}); // pontos brutos para grafico 1
             processarPonto(x, y); // processa  o ponto 
-           } 
         }
     }
+    std::cout << "Coordenadas mapeadas: " << std::endl;
+    for(size_t i = 0; i < Pontos.size(); i++) {
+        std::cout << "Ponto " << i + 1 << ": (" << Pontos[i].x << "," << Pontos[i].y << ")" << std::endl;
+    }
+}
+
  void Mapeamento::processarPonto(float px, float py) {
     bool encontrouBase = false;
     float limiteDistancia = 0.7f; 
 
     // Tenta encontrar uma base já mapeada que esteja perto
     for (auto& b : mapaFinal) {
-        // Cálculo da Distância Euclidiana
+        // Cálculo da Distância
         float d = std::sqrt(std::pow(px - b.x, 2) + std::pow(py - b.y, 2));
         
         if (d <= limiteDistancia) {
@@ -50,20 +62,27 @@ void Mapeamento::mapearCoordenadas() { // aqui é só pra pegar as coordenadas e
 void Mapeamento::gerarArquivoPlot() {
     
     // 1. Arquivo com TODOS os pontos
-    FILE* fBruto = std::fopen("pontos_brutos.txt", "w");
+    FILE* fBruto = std::fopen("pontos_brutos.json", "w");
     if (fBruto) {
+       fprintf(fBruto, "[\n");
         for(size_t i = 0; i < pontosBrutos.size(); i++) {
-            fprintf(fBruto, "%f %f\n", pontosBrutos[i].x, pontosBrutos[i].y);
+            fprintf(fBruto, "  {\"x\": %f, \"y\": %f}%s\n", 
+                    pontosBrutos[i].x, pontosBrutos[i].y, 
+                    (i == pontosBrutos.size() - 1) ? "" : ",");
         }
+        fprintf(fBruto, "]\n");
         fclose(fBruto);
     }
 
     // 2. Arquivo com os CENTROS das bases
-    FILE* fMapa = std::fopen("mapa_final.txt", "w");
+    FILE* fMapa = std::fopen("mapa_final.json", "w");
     if (fMapa) {
        for(size_t i = 0; i < mapaFinal.size(); i++) {
-            fprintf(fMapa, "%f %f\n", mapaFinal[i].x, mapaFinal[i].y);
+            fprintf(fMapa, "  {\"x\": %f, \"y\": %f, \"contagem\": %d}%s\n", 
+                    mapaFinal[i].x, mapaFinal[i].y, mapaFinal[i].contagem,
+                    (i == mapaFinal.size() - 1) ? "" : ",");
         }
+        fprintf(fMapa, "]\n");
         fclose(fMapa);
     }
     std::cout << "\nArquivos para os dois graficos gerados com sucesso!" << std::endl;
