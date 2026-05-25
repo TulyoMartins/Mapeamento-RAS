@@ -17,20 +17,25 @@ typedef struct {
 
 class Mapeamento {
     private:
- std::vector<Ponto> pontosBrutos; 
- std::vector<Base> mapaFinal;     
-
-        float tempX, tempY;
+        float x, y, dx, dy;
         int qtd;
+        std::vector<Ponto> Pontos;
+        std::vector<float> Distancia;
+        std::vector<float> Media;
 
-        Mapeamento() : qtd(0), tempX(0), tempY(0) {
-            pontosBrutos = {};
-            mapaFinal = {};
+        std::vector<Ponto> pontosBrutos; 
+        std::vector<Base> mapaFinal;     
+
+    public:
+        Mapeamento(){
+            x = 0; y = 0; dx = 0; dy = 0; qtd = 0; 
+            Pontos = {}; Distancia = {}; Media = {};
+            pontosBrutos = {}; mapaFinal = {};
         }
         
-       
- void mapearCoordenadas();
-
+        void mapearCoordenadas();
+        void calcularDistancia();
+        void calcularMedia();
         void processarPonto(float px, float py);
         void gerarArquivoPlot();
 };
